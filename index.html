@@ -53,6 +53,13 @@
             font-size: 1.2rem;
             margin-top: 1rem;
         }
+        label {
+            min-width: 70px;
+        }
+        .value-display {
+            min-width: 40px;
+            text-align: right;
+        }
     </style>
 </head>
 <body>
@@ -62,7 +69,12 @@
             <div class="slider-container">
                 <label for="bpm">BPM:</label>
                 <input type="range" id="bpm" min="30" max="120" value="60">
-                <span id="bpmValue">60</span>
+                <span id="bpmValue" class="value-display">60</span>
+            </div>
+            <div class="slider-container">
+                <label for="volume">Volume:</label>
+                <input type="range" id="volume" min="0" max="100" value="100">
+                <span id="volumeValue" class="value-display">100</span>
             </div>
             <button id="startStop">Start</button>
         </div>
@@ -80,6 +92,8 @@
         const startStopButton = document.getElementById('startStop');
         const bpmSlider = document.getElementById('bpm');
         const bpmValue = document.getElementById('bpmValue');
+        const volumeSlider = document.getElementById('volume');
+        const volumeValue = document.getElementById('volumeValue');
 
         function createBeep() {
             const oscillator = audioContext.createOscillator();
@@ -89,7 +103,9 @@
             oscillator.type = 'sine';
             oscillator.frequency.value = 440;
             
-            gainNode.gain.value = 0.1;
+            // Convert volume percentage to gain value (0-1)
+            const volumeGain = (volumeSlider.value / 100) * 0.1;
+            gainNode.gain.value = volumeGain;
 
             stereoPanner.pan.value = currentSide === 'left' ? -1 : 1;
             
@@ -137,6 +153,11 @@
                 stopBeeping();
                 startBeeping();
             }
+        });
+
+        volumeSlider.addEventListener('input', () => {
+            volumeValue.textContent = volumeSlider.value;
+            // If playing, the next beep will use the new volume
         });
     </script>
 </body>
